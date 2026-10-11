@@ -38,11 +38,21 @@ class PassRevealWidget extends StatefulWidget {
 
 class _PassRevealWidgetState extends State<PassRevealWidget> {
   bool _isRevealed = false;
+  bool _hasPeeked = false;
+  int _lastRevealIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<GameProvider>(context);
+    
+    if (_lastRevealIndex != provider.currentRevealIndex) {
+      _lastRevealIndex = provider.currentRevealIndex;
+      _isRevealed = false;
+      _hasPeeked = false;
+    }
+
     final player = provider.players[provider.currentRevealIndex];
+    final isLastPlayer = provider.currentRevealIndex == provider.players.length - 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -69,7 +79,10 @@ class _PassRevealWidgetState extends State<PassRevealWidget> {
               const SizedBox(height: 40),
               // Hold to reveal card
               GestureDetector(
-                onTapDown: (_) => setState(() => _isRevealed = true),
+                onTapDown: (_) => setState(() {
+                  _isRevealed = true;
+                  _hasPeeked = true;
+                }),
                 onTapUp: (_) => setState(() => _isRevealed = false),
                 onTapCancel: () => setState(() => _isRevealed = false),
                 child: Container(
@@ -125,16 +138,30 @@ class _PassRevealWidgetState extends State<PassRevealWidget> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
-                    setState(() => _isRevealed = false);
-                    provider.nextReveal();
-                  },
+                  onPressed: _hasPeeked
+                      ? () {
+                          setState(() {
+                            _isRevealed = false;
+                            _hasPeeked = false;
+                          });
+                          provider.nextReveal();
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B5CF6),
-                    foregroundColor: Colors.white,
+                    backgroundColor: _hasPeeked ? const Color(0xFF8B5CF6) : Colors.white.withOpacity(0.08),
+                    foregroundColor: _hasPeeked ? Colors.white : Colors.white38,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: _hasPeeked ? 2 : 0,
                   ),
-                  child: const Text('NEXT PLAYER', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                  child: Text(
+                    isLastPlayer ? 'START GAME' : 'NEXT PLAYER',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: _hasPeeked ? Colors.white : Colors.white38,
+                    ),
+                  ),
                 ),
               ),
             ],
