@@ -22,6 +22,7 @@ class GameProvider extends ChangeNotifier {
   int imposterCount = 1;
   int discussionTimeSeconds = 90;
   bool useUndercover = false;
+  bool singleVoteMode = false;
 
   List<WordPack> wordPacks = DefaultWordPacks.getPacks();
   
@@ -79,6 +80,11 @@ class GameProvider extends ChangeNotifier {
 
   void toggleUndercover(bool value) {
     useUndercover = value;
+    notifyListeners();
+  }
+
+  void setSingleVoteMode(bool value) {
+    singleVoteMode = value;
     notifyListeners();
   }
 
@@ -195,12 +201,24 @@ class GameProvider extends ChangeNotifier {
     player.isEliminated = true;
     eliminatedPlayerId = playerId;
 
-    if (player.isImposter) {
-      // Imposter caught! Check if they can guess the secret word
-      currentPhase = GamePhase.imposterGuess;
+    if (singleVoteMode) {
+      if (player.isImposter) {
+        currentPhase = GamePhase.imposterGuess;
+      } else {
+        winningTeam = 'imposters';
+        for (var p in players) {
+          if (p.isImposter) p.score += 3;
+        }
+        currentPhase = GamePhase.gameOver;
+      }
     } else {
-      // Civilian eliminated! Check if imposters win
-      checkWinCondition();
+      if (player.isImposter) {
+        // Imposter caught! Check if they can guess the secret word
+        currentPhase = GamePhase.imposterGuess;
+      } else {
+        // Civilian eliminated! Check if imposters win
+        checkWinCondition();
+      }
     }
     notifyListeners();
   }

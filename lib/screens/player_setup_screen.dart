@@ -217,6 +217,44 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+              // Single Vote Mode setting
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Single Vote Mode',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Catch poser in one vote or lose',
+                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    Switch(
+                      value: gameProvider.singleVoteMode,
+                      activeColor: const Color(0xFFEC4899),
+                      onChanged: (val) => gameProvider.setSingleVoteMode(val),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 20),
               // Start Game Action
               SizedBox(

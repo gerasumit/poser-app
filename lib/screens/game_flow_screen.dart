@@ -104,7 +104,10 @@ class _PassRevealWidgetState extends State<PassRevealWidget> {
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('YOUR SECRET WORD', style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 1.5)),
+                              Text(
+                                player.isImposter ? 'A CLUE TO THE SECRET WORD' : 'YOUR SECRET WORD',
+                                style: const TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 1.5),
+                              ),
                               const SizedBox(height: 12),
                               Text(
                                 player.assignedWord ?? '',

@@ -15,6 +15,7 @@ void main() {
       expect(provider.players.length, 0);
       expect(provider.currentPhase, GamePhase.setup);
       expect(provider.imposterCount, 1);
+      expect(provider.singleVoteMode, isFalse);
     });
 
     test('Add and remove players', () async {
@@ -89,6 +90,24 @@ void main() {
 
       expect(civilian.isEliminated, isTrue);
       expect(provider.eliminatedPlayerId, civilian.id);
+    });
+
+    test('Single vote mode makes imposters win immediately if civilian is eliminated', () async {
+      final provider = GameProvider();
+      await Future.delayed(const Duration(milliseconds: 100));
+      provider.addPlayer('Alice');
+      provider.addPlayer('Bob');
+      provider.addPlayer('Charlie');
+      provider.setSingleVoteMode(true);
+      provider.startGame();
+
+      // Find a civilian
+      final civilian = provider.players.firstWhere((p) => !p.isImposter);
+      provider.eliminatePlayer(civilian.id);
+
+      expect(civilian.isEliminated, isTrue);
+      expect(provider.winningTeam, 'imposters');
+      expect(provider.currentPhase, GamePhase.gameOver);
     });
   });
 }
